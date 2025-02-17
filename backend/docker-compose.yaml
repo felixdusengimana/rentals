@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: lala_rentals_db
+    environment:
+      POSTGRES_USER: lala_user
+      POSTGRES_PASSWORD: lala_password
+      POSTGRES_DB: lala_rentals
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lala_network
+
+networks:
+  lala_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
