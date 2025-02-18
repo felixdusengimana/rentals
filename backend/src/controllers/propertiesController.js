@@ -2,7 +2,7 @@ import { Property } from '../models/Property.js';
 
 export const createProperty = async (req, res) => {
   try {
-    const { title, description, pricePerNight, location, parentId, propertyType, images } = req.body;
+    const { title, description, pricePerNight, location, parentId, propertyType, images, hostId } = req.body;
 
     if(parentId){
       const parentProperty = await Property.findByPk(parentId);
@@ -14,7 +14,7 @@ export const createProperty = async (req, res) => {
       description,
       pricePerNight,
       location,
-      hostId: 1,
+      hostId,
       status: 'ACTIVE',
       parentId,
       propertyType,
@@ -135,5 +135,52 @@ export const getPropertyById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching property', error: error.message });
   }
 };
+
+
+export const getAllPropertiesByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { page = 1, pageSize = 10 } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required' });
+    }
+
+    const offset = (page - 1) * pageSize; 
+
+    const properties = await Property.findAll({
+      where: { hostId: userId, parentId: null },
+      offset,
+      limit: pageSize,
+      include: [
+        {
+          model: Property,
+          as: 'parent', 
+          required: false, 
+        },
+        {
+          model: Property,
+          as: 'children', 
+          required: false,
+        }
+      ],
+    });
+
+    const totalProperties = await Property.count({ where: { hostId: userId, parentId: null } });
+    const totalPages = Math.ceil(totalProperties / pageSize);
+
+    res.status(200).json({
+      data: properties,
+      page: page,
+      pageSize: pageSize,
+      totalPages: totalPages,
+      totalProperties: totalProperties,
+      status: 'success',
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching properties', error: error.message });
+  }
+}
 
 

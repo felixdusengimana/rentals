@@ -3,10 +3,10 @@ import { getAllUsers, getUserById, updateUserRole } from '../controllers/usersCo
 import { isAdmin, isAuthenticated } from '../middleware/authMiddleware.js'; 
 const router = express.Router();
 
-router.get('/', isAuthenticated, isAdmin, getAllUsers);
+router.get('/', isAdmin, getAllUsers);
 
-router.get('/:id', isAuthenticated, getUserById);
+router.get('/:id', getUserById);
 
-router.put('/:id/role', isAuthenticated, isAdmin, updateUserRole);
+router.put('/:id/role', updateUserRole);
 
 export default router;

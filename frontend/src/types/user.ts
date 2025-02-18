@@ -7,3 +7,9 @@ export interface IUser extends ITable{
     role: string;
     photo: string;
 }
+
+export enum ERole{
+    ADMIN = "ADMIN",
+    RENTER = "RENTER",
+    HOST = "HOST",
+}

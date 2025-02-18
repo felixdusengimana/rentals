@@ -1,5 +1,4 @@
 "use client"
-import useAuth from '@/src/hooks/useAuth';
 import { IProperty } from '@/src/types/properties';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -9,9 +8,7 @@ const fetchProperties = async () => {
   return data;
 };
 
-export default function Home() {
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
- 
+export default function Home() { 
 
   const { data: properties, isLoading, isError } = useQuery({
     queryKey: ['properties'],
@@ -27,8 +24,8 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {properties.map((property: IProperty) => (
           <div key={property.id} className="bg-white shadow-md rounded-lg p-4">
-            <img src={property.images?.[0]} alt={property.name} className="w-full h-48 object-cover rounded-md mb-4" />
-            <h2 className="text-xl font-semibold">{property.name}</h2>
+            <img src={property.images?.[0]} alt={property.title} className="w-full h-48 object-cover rounded-md mb-4" />
+            <h2 className="text-xl font-semibold">{property.title}</h2>
             <p className="text-gray-600">{property.description}</p>
             <p className="text-lg font-bold mt-2">${property.pricePerNight} / night</p>
             <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">View Details</button>

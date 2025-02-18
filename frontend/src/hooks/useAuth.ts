@@ -1,11 +1,10 @@
 import api from "@/src/utils/axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 const useAuth = () => {
   const queryClient = useQueryClient();
 
-  const { data: user, error, isLoading } = useQuery({
+  const { data: user, refetch, error, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       const res = await api.get(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/user`);
@@ -33,6 +32,7 @@ const useAuth = () => {
 
   return {
     user,
+    refetchUser: refetch,
     isLoading,
     isAuthenticated: !!user,
     error,
