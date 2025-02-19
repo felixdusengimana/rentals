@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Property } from '../models/Property.js';
 
 export const createProperty = async (req, res) => {
@@ -32,7 +33,7 @@ export const createProperty = async (req, res) => {
 export const updateProperty = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, pricePerNight, location, propertyType, parentId } = req.body;
+    const { title, description, pricePerNight, location, propertyType, parentId, propertyStatus } = req.body;
 
     const property = await Property.findByPk(id);
 
@@ -87,10 +88,13 @@ export const updatePropertyStatus = async (req, res) => {
 export const getAllProperties = async (req, res) => {
   try {
     const { parentId,  page = 1, pageSize = 10 } = req.query;
-    const offset = (page - 1) * pageSize; 
+    const offset = (page - 1) * pageSize;
 
     const properties = await Property.findAll({
-      where: parentId ? { parentId} : {parentId: null},
+      where: {
+        parentId: parentId || null,
+        status: { [Op.ne]: 'DELETED' }
+      },
       limit: pageSize, 
       offset,
       include: [{
@@ -126,7 +130,7 @@ export const getPropertyById = async (req, res) => {
       ],
     });
 
-    if (!property || property.status === 'DELETED') {
+    if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
 
@@ -149,7 +153,11 @@ export const getAllPropertiesByUser = async (req, res) => {
     const offset = (page - 1) * pageSize; 
 
     const properties = await Property.findAll({
-      where: { hostId: userId, parentId: null },
+      where: { 
+        hostId: userId, 
+        parentId: null,
+        status: { [Op.ne]: 'DELETED' }
+       },
       offset,
       limit: pageSize,
       include: [
@@ -174,7 +182,7 @@ export const getAllPropertiesByUser = async (req, res) => {
       page: page,
       pageSize: pageSize,
       totalPages: totalPages,
-      totalProperties: totalProperties,
+      totalElements: totalProperties,
       status: 'success',
     });
 

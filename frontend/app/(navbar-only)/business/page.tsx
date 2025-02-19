@@ -18,7 +18,7 @@ const RentalAgreement = () => {
     },
     onSuccess: () => {
       refetchUser();
-      router.replace('/list-property');
+      router.replace('/dashboard');
     },
   });
 

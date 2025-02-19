@@ -15,7 +15,7 @@ const Dropdown = ({ trigger, children }: DropdownProps) => {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="bg-white rounded-md shadow-lg p-1 min-w-[180px] z-20" sideOffset={5}>
+        <DropdownMenu.Content className="bg-white rounded-md shadow-lg border min-w-[180px] z-20" sideOffset={5}>
           {children}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

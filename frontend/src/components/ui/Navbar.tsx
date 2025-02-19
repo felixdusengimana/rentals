@@ -21,7 +21,7 @@ const Navbar = () => {
   }
 
   const loggedDropdownItems = [
-    { title: 'Profile', link: '/profile' },
+    { title: 'Dashboard', link: '/bookings' },
     { title: 'Settings', link: '/settings' },
   ];
 

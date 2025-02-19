@@ -15,7 +15,7 @@ router.post('/',  initiatePayment);
 router.get('/', getAllPayments);
 router.get('/:id',  getPaymentById);
 router.put('/:id/confirm',  confirmPayment);
-router.put('/:id/refund',  isSeller, refundPayment);
+router.put('/:id/refund',  refundPayment);
 router.get('/byBooking/:bookingId',  getPaymentStatus);
 
 export default router;

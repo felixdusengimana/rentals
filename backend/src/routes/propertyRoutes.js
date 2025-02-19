@@ -12,8 +12,8 @@ import { isAuthenticated, isSeller } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.post('/',createProperty);
-router.put('/:id', isAuthenticated, isSeller, updateProperty);
-router.put('/:id/status', isAuthenticated, isSeller, updatePropertyStatus);
+router.put('/:id', updateProperty);
+router.put('/:id/status', updatePropertyStatus);
 router.get('/', getAllProperties);
 router.get('/:id', getPropertyById);
 router.get('/by-user/:userId', getAllPropertiesByUser);

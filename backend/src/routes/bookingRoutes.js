@@ -16,5 +16,5 @@ router.get("/",  getAllBookings);
 router.get("/:id",  getBookingById);
 router.put('/confirm', confirmBooking);
 router.put('/cancel', cancelBooking);
-router.get('/my', getUserBookings);
+router.get('/my/:userId', getUserBookings);
 export default router;

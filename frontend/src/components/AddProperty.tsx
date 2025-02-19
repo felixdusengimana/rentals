@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addPropertySchema, IAddPropertyInputs, IProperty, PROPERTY_TYPES } from "@/src/types/properties";
+import { addPropertySchema, EStatus, IAddPropertyInputs, IProperty, PROPERTY_TYPES } from "@/src/types/properties";
 import { ReactNode } from 'react';
 import toast from "react-hot-toast";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/axios';
 import Input from './ui/Input';
 import TextArea from './ui/TextArea';
@@ -14,8 +14,9 @@ import { IoClose } from 'react-icons/io5';
 import Select from './ui/Select';
 import useAuth from '../hooks/useAuth';
 
-const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProperty }) => {
+const AddProperty = ({ trigger, parent, property }: { trigger: ReactNode, parent?: IProperty, property?: IProperty }) => {
     const {user} = useAuth();
+    const queryClient = useQueryClient();
     const modalRef = useRef<CustomDialogRef>(null);
 
     const {
@@ -27,16 +28,24 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
     } = useForm<IAddPropertyInputs>({
         resolver: zodResolver(addPropertySchema),
         defaultValues: {
-            parentId: parent?.id??undefined,
-            images: [""],
-            propertyType: parent?.propertyType,
+            parentId: property?.parentId ?? parent?.id??undefined,
+            images: property?.images??[""],
+            propertyType: property?.propertyType?? parent?.propertyType,
             hostId: user?.id,
+            description: property?.description,
+            location: property?.location,
+            pricePerNight: property?.pricePerNight,
+            title: property?.title,
+            propertyStatus: property?.status??EStatus.ACTIVE,
         },
     });
 
     const { mutate, isPending } = useMutation({
         onSuccess() {
             toast.success("Registration successful!", { id: "register" });
+            queryClient.invalidateQueries({
+                queryKey: ["properties"],
+            });
             reset();
             modalRef.current?.close();
         },
@@ -48,19 +57,40 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
         mutationFn: (data: IAddPropertyInputs) => api.post("/properties", data),
     });
 
+
+    const { mutate: update, isPending: isUpdating } = useMutation({
+        onSuccess() {
+            toast.success("Updating successful!", { id: "register" });
+            queryClient.invalidateQueries({
+                queryKey: ["properties"],
+            });
+            reset();
+            modalRef.current?.close();
+        },
+        onError(error) {
+            toast.error(`${error.message ?? "Update failed!"}`, {
+                id: "register",
+            });
+        },
+        mutationFn: (data: IAddPropertyInputs) => api.put(`/properties/${property?.id}`, data),
+    });
+
+
     const onSubmit = (data: IAddPropertyInputs) => {
-        toast.loading("Registering...", { id: "register" });
+        toast.loading(`${property?.id?"Updating...":"Registering..."}`, { id: "register" });
         const nwe = data.images.filter((url, index, self) => url && self.indexOf(url) === index);
         if (!parent?.id) delete data.parentId;
-        mutate({ ...data, images: nwe });
+        if (property?.id) {
+            update({ ...data, images: nwe });
+        } else {
+            mutate({ ...data, images: nwe });
+        }
     };
-
-    console.log({errors})
 
     return (
         <CustomDialog 
-        title={`Add ${parent?.id?`Room in ${parent.title}`:"Property"} `}
-        description={`Fill in the details to add a new ${parent?.id?"room":"property"}`}
+        title={`${property?.id?"Update":"Add"} ${parent?.id?`Room in ${parent.title}`:"Property"} `}
+        description={`Fill in the details to ${property?.id?"update":"add a new"} ${parent?.id?"room":"property"}`}
         ref={modalRef} trigger={trigger}>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Input
@@ -75,6 +105,7 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                             shouldDirty: true,
                         })
                     }
+                    value={watch("title")}
                 />
 
                 <Input
@@ -88,6 +119,8 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                             shouldDirty: true,
                         })
                     }
+                    type="number"
+                    value={watch("pricePerNight")}
                 />
 
                 <Input
@@ -101,6 +134,7 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                             shouldDirty: true,
                         })
                     }
+                    value={watch("location")}
                 />
 
                 {parent?.id?null:<Select
@@ -132,6 +166,7 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                             shouldDirty: true,
                         })
                     }
+                    value={watch("description")}
                 />
 
 
@@ -152,6 +187,7 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                                     shouldDirty: true,
                                 });
                             }}
+                            value={watch("images")[index]}
                             right={
                                 watch("images").length<=1 ? null :
                                 <button
@@ -195,7 +231,7 @@ const AddProperty = ({ trigger, parent }: { trigger: ReactNode, parent?: IProper
                         Cancel
                     </Button>
                     <Button isLoading={isPending} className="px-[72px]">
-                        {isPending ? `Adding ${parent?.id?"room":"propery"}...` : `Add ${parent?.id?"room":"propery"}`}
+                        {isPending ||isUpdating ? `${property?.id?"Updating":"Adding"} ${parent?.id?"room":"propery"}...` : `${property?.id?"Update":"Add"} ${parent?.id?"room":"propery"}`}
                     </Button>
                 </div>
             </form>

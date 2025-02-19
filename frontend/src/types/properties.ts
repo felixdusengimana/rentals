@@ -10,7 +10,13 @@ export interface IProperty extends ITable {
     location: string;
     parentId?: string;
     propertyType: string;
-    status: string;
+    status: EStatus;
+}
+
+export enum EStatus {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    DELETED = 'DELETED'
 }
 
 export const PROPERTY_TYPES = [
@@ -65,5 +71,6 @@ export const addPropertySchema = z.object({
         required_error: "Property type is required",
     }),
     hostId: z.number(),
+    propertyStatus: z.nativeEnum(EStatus).optional().default(EStatus.ACTIVE)
 })
 export type IAddPropertyInputs = z.infer<typeof addPropertySchema>;

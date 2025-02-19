@@ -1,22 +1,25 @@
 "use client"
 import AddProperty from '@/src/components/AddProperty';
+import ChangePropertyStatus from '@/src/components/ChangePropertyStatus';
 import PageLayout from '@/src/components/PageLayout';
 import Button from '@/src/components/ui/Button';
 import Dropdown from '@/src/components/ui/Dropdown';
 import { CustomTable } from '@/src/components/ui/Table';
 import useAuth from '@/src/hooks/useAuth';
 import { IPaginatedResponse } from '@/src/types';
-import { IProperty } from '@/src/types/properties';
+import { EStatus, IProperty } from '@/src/types/properties';
 import api from '@/src/utils/axios';
 import { useQuery } from '@tanstack/react-query';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import Link from 'next/link';
 import React from 'react'
 import { useState } from 'react';
-import { BiDotsHorizontal } from 'react-icons/bi';
+import { BiDotsHorizontal, BiPen, BiTrash } from 'react-icons/bi';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 export default function PropertiesList() {
     const {user} = useAuth();
-    const { data: properties, isLoading } = useQuery({
+    const { data: properties, isPending, isFetching, isLoading } = useQuery({
         queryKey: ["properties", user?.id],
         queryFn: async () => {
           const res = await api.get<IPaginatedResponse<IProperty>>(`${process.env.NEXT_PUBLIC_BASE_URL}/properties/by-user/${user?.id}`);
@@ -88,16 +91,41 @@ export default function PropertiesList() {
                 header: () => <span>Actions</span>,
                 cell: (info) => <p className='flex items-center'>
                     <Dropdown trigger={<BiDotsHorizontal />}>
-                        <p>Edit</p>
-                        <p>Delete</p>
+                        <Link
+                        className='flex items-center cursor-pointer gap-1 p-2 border-b '
+                        href={`/properties/${info.row.original.id}/bookings`}
+                        >
+                            <HiEye/>
+                            <span>View Bookings</span>
+                        </Link>
+                        {info.row.original.status==EStatus.ACTIVE&&<AddProperty property={info.row.original} trigger={<p className='flex items-center cursor-pointer gap-1 p-2 border-b '>
+                            <BiPen/>
+                            <span>Edit</span>
+                        </p>}/>}
+                        {info.row.original.status!==EStatus.DELETED&&<ChangePropertyStatus
+                        newStatus={info.row.original.status===EStatus.INACTIVE ? EStatus.ACTIVE : EStatus.INACTIVE}
+                        property={info.row.original}
+                        trigger={<p className='flex items-center cursor-pointer gap-1 p-2 border-b'>
+                            {info.row.original.status===EStatus.INACTIVE ? <HiEye/> : <HiEyeOff/>}
+                            <span>{info.row.original.status===EStatus.INACTIVE ? 'Activate' : 'Deactivate'}</span>
+                        </p>}
+                        />}
+                        {info.row.original.status!==EStatus.DELETED&&
+                        <ChangePropertyStatus
+                        newStatus={EStatus.DELETED}
+                        property={info.row.original}
+                        trigger={<p className='flex text-red-500 items-center cursor-pointer gap-1 p-2'>
+                            <BiTrash/>
+                            <span>Delete</span>
+                        </p>}
+                        />
+                        }
                         </Dropdown>
                 </p>,
                 footer: (info) => info.column.id,
             }),
         
     ]);
-
-
 
     const table = useReactTable({
         data: properties?.data || [],
@@ -109,9 +137,7 @@ export default function PropertiesList() {
         // onRowSelectionChange: setRowSelection,
         // onColumnVisibilityChange: setColumnVisibility,
         getCoreRowModel: getCoreRowModel(),
-      });
-    
-
+    });
   return (
     <PageLayout>
         <div className='flex justify-between items-center mb-4'>
@@ -123,7 +149,7 @@ export default function PropertiesList() {
             </div>
             <AddProperty  trigger={<Button>Add Property</Button>}/>
         </div>
-        <CustomTable table={table} loading={isLoading}/>
+        <CustomTable table={table} loading={isPending||isFetching||isLoading}/>
     </PageLayout>
   )
 }

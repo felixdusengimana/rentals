@@ -3,7 +3,7 @@ import { getAllUsers, getUserById, updateUserRole } from '../controllers/usersCo
 import { isAdmin, isAuthenticated } from '../middleware/authMiddleware.js'; 
 const router = express.Router();
 
-router.get('/', isAdmin, getAllUsers);
+router.get('/',  getAllUsers);
 
 router.get('/:id', getUserById);
 

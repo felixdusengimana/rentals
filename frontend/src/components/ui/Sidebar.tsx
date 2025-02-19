@@ -1,9 +1,10 @@
 "use client"
 import React from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
-import { HiMenu, HiX, HiPlus, HiOfficeBuilding, HiChevronDown, HiHome, HiCog, HiQuestionMarkCircle, HiLogout } from 'react-icons/hi';
+import { HiMenu, HiX, HiPlus, HiOfficeBuilding, HiChevronDown, HiHome, HiCog, HiQuestionMarkCircle, HiLogout, HiBookOpen } from 'react-icons/hi';
 import useAuth from '@/src/hooks/useAuth';
 import AddProperty from '../AddProperty';
+import Link from 'next/link';
 
 const Sidebar = ({isExpanded, setIsExpanded}:{
     isExpanded: boolean;
@@ -23,47 +24,70 @@ const Sidebar = ({isExpanded, setIsExpanded}:{
             </button>
 
             <nav className="p-4 space-y-4">
-                <div className="space-y-2">
-                    <AddProperty trigger={<p className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg text-blue-600">
-                        <HiPlus className="h-5 w-5" />
-                        {isExpanded && <span>Add Property</span>}
-                    </p>}/>
+                <Link href="/dashboard" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                    <HiHome className="h-5 w-5" />
+                    {isExpanded && <span>Dashboard</span>}
+                </Link>
 
+                <div className="space-y-2">
+                    <Collapsible.Root className="space-y-1">
+                        <Collapsible.Trigger className="flex items-center justify-between w-full p-2 hover:bg-gray-100 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <HiBookOpen className="h-5 w-5" />
+                                {isExpanded && <span>Bookings</span>}
+                            </div>
+                            {isExpanded && <HiChevronDown className="h-4 w-4" />}
+                        </Collapsible.Trigger>
+
+                        {isExpanded && (
+                            <Collapsible.Content className="pl-9 space-y-1">    
+                                <Link href="/my-bookings" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                                    {isExpanded && <span>My Bookings</span>}
+                                </Link>
+                                <Link href="/bookings" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                                    {isExpanded && <span>Client Bookings</span>}
+                                </Link>
+                            </Collapsible.Content>
+                        )}
+                    </Collapsible.Root>
+                </div>
+                <div className="space-y-2">
                     <Collapsible.Root className="space-y-1">
                         <Collapsible.Trigger className="flex items-center justify-between w-full p-2 hover:bg-gray-100 rounded-lg">
                             <div className="flex items-center gap-2">
                                 <HiOfficeBuilding className="h-5 w-5" />
-                                {isExpanded && <span>Business Solutions</span>}
+                                {isExpanded && <span>Properties</span>}
                             </div>
                             {isExpanded && <HiChevronDown className="h-4 w-4" />}
                         </Collapsible.Trigger>
 
                         {isExpanded && (
                             <Collapsible.Content className="pl-9 space-y-1">
-                                <a href="#" className="block p-2 hover:bg-gray-100 rounded-lg text-sm">Enterprise</a>
-                                <a href="#" className="block p-2 hover:bg-gray-100 rounded-lg text-sm">Teams</a>
-                                <a href="#" className="block p-2 hover:bg-gray-100 rounded-lg text-sm">Solutions</a>
+                                <Link href="/properties" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                                        {isExpanded && <span>All Properties</span>}
+                                </Link>
+                                 <AddProperty trigger={<p className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg text-blue-600">
+                                    <HiPlus className="h-5 w-5" />
+                                    {isExpanded && <span>Add Property</span>}
+                                </p>}/>
                             </Collapsible.Content>
                         )}
                     </Collapsible.Root>
                 </div>
 
+
                 <div className="space-y-2 pt-4 border-t">
-                    <a href="#" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
-                        <HiHome className="h-5 w-5" />
-                        {isExpanded && <span>Dashboard</span>}
-                    </a>
-                    <a href="#" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                    
+                    <Link href="/settings" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
                         <HiCog className="h-5 w-5" />
                         {isExpanded && <span>Settings</span>}
-                    </a>
-                    <a href="#" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                    </Link>
+                    <Link href="/help" className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
                         <HiQuestionMarkCircle className="h-5 w-5" />
                         {isExpanded && <span>Help Center</span>}
-                    </a>
+                    </Link>
                 </div>
 
-                {/* User Section */}
                 {isExpanded && (
                     <div className="absolute cursor-pointer bottom-0 left-0 right-0 p-4 border-t">
                         <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg">

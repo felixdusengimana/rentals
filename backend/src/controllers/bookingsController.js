@@ -4,6 +4,7 @@ import { Payment } from "../models/Payment.js";
 import { Property } from "../models/Property.js";
 import { sendEmail } from "../utils/emailService.js";
 import { User } from "../models/User.js";
+import {filterValidProperties} from "../utils/validateFilters.js";
 
 export const createBooking = async (req, res) => {
   req.user={
@@ -92,7 +93,7 @@ export const confirmBooking = async (req, res) => {
   try {
     const { bookingId, hostEmail, renterEmail } = req.body;
 
-    const booking = await Booking.findByPk(bookingId, { include: 'Property' });
+    const booking = await Booking.findByPk(bookingId, { include: [{model: Property, as: 'property'}] });
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
     if (booking.status !== 'PENDING') {
@@ -102,7 +103,7 @@ export const confirmBooking = async (req, res) => {
     await booking.update({ status: 'CONFIRMED' });
 
     const nights = (new Date(booking.checkOutDate) - new Date(booking.checkInDate)) / (1000 * 60 * 60 * 24);
-    const amount = nights * booking.Property.pricePerNight;
+    const amount = nights * booking.property.pricePerNight;
 
     const payment = await Payment.create({
       bookingId: booking.id,
@@ -136,16 +137,31 @@ export const confirmBooking = async (req, res) => {
 
 export const cancelBooking = async (req, res) => {
   try {
-    const { id } = req.params;
-    const booking = await Booking.findByPk(id, { include: Property });
+    const { bookingId, hostEmail, renterEmail } = req.body;
 
+    const booking = await Booking.findByPk(bookingId);
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
-    if (req.user.id !== booking.renterId && req.user.id !== booking.Property.hostId) {
-      return res.status(403).json({ message: 'Only the renter or host can cancel this booking' });
+    if (booking.status !== 'PENDING') {
+      return res.status(400).json({ message: 'Booking is not in pending state' });
     }
 
     await booking.update({ status: 'CANCELED' });
+
+    const hostEmailContent = `
+      <h2>Booking Canceled</h2>
+      <p>Dear Host,</p>
+      <p>Your booking ID: <strong>${bookingId}</strong> has been canceled by the renter.</p>
+    `;
+    await sendEmail(hostEmail, 'Booking Canceled - LaLa Booking', hostEmailContent);
+
+    const renterEmailContent = `
+      <h2>Booking Canceled</h2>
+      <p>Dear Renter,</p>
+      <p>Your booking ID: <strong>${bookingId}</strong> has been canceled.</p>
+    `;
+
+    await sendEmail(renterEmail, 'Booking Canceled - LaLa Booking', renterEmailContent);
 
     res.status(200).json({ message: 'Booking canceled', booking });
   } catch (error) {
@@ -155,33 +171,59 @@ export const cancelBooking = async (req, res) => {
 
   export const getUserBookings = async (req, res) => {
     try {
+      const { userId } = req.params;
+      const {userType, page = 1, pageSize = 10} = req.query;
+      const offset = (page - 1) * pageSize;
       let bookings;
+      let total = 0;
       
-      if (req.user.role === 'RENTER') {
+      if (userType === 'RENTER') {
         bookings = await Booking.findAll({
-          where: { renterId: req.user.id },
-          include: [{
-            model: Payment,
-            attributes: ['amount', 'status', 'paymentMethod', 'transactionId'],
-            required: false, 
-          }]
-        });
-      } else if (req.user.role === 'HOST') {
-        bookings = await Booking.findAll({
+          offset,
+          limit: pageSize,
+          where: { renterId: userId},
           include: [{
             model: Property,
-            where: { hostId: req.user.id },
-            include: [{
-              model: Payment, 
-              attributes: ['amount', 'status', 'paymentMethod', 'transactionId'],
-              required: false,
-            }]
+            as: 'property'
+          },{
+            model: Payment,
           }]
         });
+
+        total = await Booking.count({ where: { renterId: userId } });
+      } else if (userType === 'HOST') {
+        bookings = await Booking.findAll({
+          offset,
+          limit: pageSize,
+          include: [{
+            model: Property,
+            as: 'property',
+            where: { hostId: userId },
+          },
+          {
+            model: User,
+            as: 'renter',
+          },
+          {
+            model: Payment,
+          }]
+        });
+
+        total = await Booking.count({ include: [{ model: Property,as: 'property', where: { hostId: userId } }] });
       }
       
   
-      res.status(200).json(bookings);
+
+      const totalPages = Math.ceil(total / pageSize);
+  
+      res.status(200).json({
+        data: bookings??[],
+        page: page,
+        pageSize: pageSize,
+        totalPages: totalPages,
+        totalElements: total,
+        status: 'success',
+      });
     } catch (error) {
       res.status(500).json({ message: 'Error fetching bookings', error: error.message });
     }
@@ -189,21 +231,39 @@ export const cancelBooking = async (req, res) => {
 
 export const getAllBookings = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
-      const offset = (page - 1) * pageSize; 
+    const { propertyId, page = 1, pageSize = 10 } = req.query;
+    const offset = (page - 1) * pageSize; 
+
+    const filters =filterValidProperties({propertyId});
+
 
     const bookings = await Booking.findAll({
+      where: filters,
       limit: pageSize,
       offset,
       include: [{
         model: Property,
+        as: 'property',
       },{
         model: User,
         as: 'renter',
+      },{
+        model: Payment,
       }]
     });
 
-    res.status(200).json(bookings);
+    const total = await Booking.count({ where: filters });
+    const totalPages = Math.ceil(total / pageSize);
+
+    res.status(200).json({
+      data: bookings??[],
+      page: page,
+      pageSize: pageSize,
+      totalPages: totalPages,
+      totalElements: total,
+      status: 'success',
+    });
+
   } catch (error) {
     res.status(500).json({ message: 'Error fetching bookings', error: error.message });
   }
