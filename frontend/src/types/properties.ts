@@ -10,6 +10,7 @@ export interface IProperty extends ITable {
     location: string;
     parentId?: string;
     propertyType: string;
+    hostId: number;
     status: EStatus;
 }
 
@@ -66,7 +67,7 @@ export const addPropertySchema = z.object({
     location: z.string({
         required_error: "Location is required",
     }).min(3, "Location is too short"),
-    parentId: z.string().optional(),
+    parentId: z.number().optional(),
     propertyType: z.string({
         required_error: "Property type is required",
     }),

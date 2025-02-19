@@ -1,12 +1,13 @@
 "use client"
 import * as Dialog from '@radix-ui/react-dialog';
+import { ReactNode } from 'react';
 import { RxCross1 } from 'react-icons/rx';
 
-export default function AuthModel({ type, label }: { type: "login" | "signup", label?: string }) {
+export default function AuthModel({ type, trigger }: { type: "login" | "signup", trigger?: ReactNode }) {
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
-            <p className="cursor-pointer py-2 text-sm font-medium hover:text-gray-300">{label?label: type=="login"?"Log In":"Sign Up"}</p>
+            {trigger?trigger:<p className="cursor-pointer py-2 text-sm font-medium hover:text-gray-300">{type=="login"?"Log In":"Sign Up"}</p>}
             </Dialog.Trigger>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />

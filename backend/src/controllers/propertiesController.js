@@ -91,10 +91,11 @@ export const getAllProperties = async (req, res) => {
     const { parentId, category,  page = 1, pageSize = 10 } = req.query;
     const offset = (page - 1) * pageSize;
 
-    const filters = filterValidProperties({category,parentId});
+    const filters = filterValidProperties({propertyType: category,parentId});
     const properties = await Property.findAll({
       where: {
         ...filters,
+        parentId: parentId || null,
         status: { [Op.ne]: 'DELETED' }
       },
       limit: pageSize, 
@@ -156,7 +157,7 @@ export const getPropertyById = async (req, res) => {
 export const getAllPropertiesByUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page = 1, pageSize = 10 } = req.query;
+    const { parentId, page = 1, pageSize = 10 } = req.query;
 
     if (!userId) {
       return res.status(400).json({ message: 'userId is required' });
@@ -167,7 +168,7 @@ export const getAllPropertiesByUser = async (req, res) => {
     const properties = await Property.findAll({
       where: { 
         hostId: userId, 
-        parentId: null,
+        parentId: parentId || null,
         status: { [Op.ne]: 'DELETED' }
        },
       offset,

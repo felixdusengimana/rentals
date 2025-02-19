@@ -4,7 +4,6 @@ import PageLayout from '@/src/components/PageLayout';
 import Dropdown from '@/src/components/ui/Dropdown';
 import { CustomTable } from '@/src/components/ui/Table';
 import ViewPayment from '@/src/components/ViewPayment';
-import ViewProperty from '@/src/components/ViewProperty';
 import useAuth from '@/src/hooks/useAuth';
 import { IPaginatedResponse } from '@/src/types';
 import { EBookingStatus, IBooking } from '@/src/types/booking';

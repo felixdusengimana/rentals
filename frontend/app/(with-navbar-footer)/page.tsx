@@ -1,30 +1,20 @@
 "use client"
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { IProperty } from '@/src/types/properties';
 import HomeTravelFIlters from '@/src/components/HomeTravelFIlters';
 import PropertiesGrid from '@/src/components/PropertiesGrid';
-import { objectToQueryString } from '@/src/utils/queryParam';
-import { IPaginatedResponse } from '@/src/types';
+import { fetchProperties } from '@/src/services/properties';
 
-
-const fetchProperties = async ({category}:{category?: string}) => {
-  const queryString = objectToQueryString({category});
-  const { data } = await axios.get<IPaginatedResponse<IProperty>>(`${process.env.NEXT_PUBLIC_BASE_URL}/properties?${queryString}`);
-  return data;
-};
 
 
 
 export default function Home(){
   const [filters, setFilters] = React.useState<{category?: string, location?: string, dateRange?: {start: string, end: string}, guests?: Record<string, number>}>();
 
-  const { data: properties, isLoading, isError } = useQuery({
-    queryKey: ['properties'],
+  const { data: properties, isLoading, isFetching, isPending, isError } = useQuery({
+    queryKey: ['properties', filters?.category, filters?.location],
     queryFn: ()=>fetchProperties({category: filters?.category}),
   });
-
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -32,7 +22,7 @@ export default function Home(){
         <HomeTravelFIlters handleFilters={(s)=>setFilters(s)}/>
         </div>
         <main className="max-w-7xl mx-auto px-4">
-          <PropertiesGrid properties={properties?.data??[]} isLoading={isLoading} isError={isError}/>
+          <PropertiesGrid properties={properties?.data??[]} isLoading={isLoading||isFetching||isPending} isError={isError}/>
         </main>
       </div>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { EStatus, IProperty } from '../types/properties';
 import { BiChevronLeft, BiChevronRight, BiHeart } from 'react-icons/bi';
+import Link from 'next/link';
 
 const DEFAULT_IMAGE = "https://cornerstonepropertymgmt.com/wp-content/themes/cornerstone/assets/img/nofeaturedimage.jpg";
 
@@ -36,7 +37,11 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
 
 
   return (
-    <div className="relative group">
+    <Link href={
+      (property?.children?.length&&property?.children?.length > 0)
+        ? `/property/${property.id}`
+        : `/property/${property.id}/book`
+    } className="relative group">
       <div className="overflow-hidden rounded-xl aspect-square">
         {hasImages ? (
           <div className="relative w-full h-full">
@@ -123,10 +128,10 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
           </div>
         </div>
         <p className="text-gray-500 text-sm">{property.location}</p>
-        <p className="text-gray-500 text-sm">{property.propertyType}</p>
+        <p className="text-gray-500 text-sm">{property.propertyType} {property.parentId?"ROOM":""}</p>
         <p className="font-medium mt-1">${property.pricePerNight} <span className="font-normal text-gray-500">night</span></p>
       </div>
-    </div>
+    </Link>
   );
 };
 

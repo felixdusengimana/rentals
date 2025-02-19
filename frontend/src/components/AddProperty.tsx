@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addPropertySchema, EStatus, IAddPropertyInputs, IProperty, PROPERTY_TYPES } from "@/src/types/properties";
@@ -28,13 +28,13 @@ const AddProperty = ({ trigger, parent, property }: { trigger: ReactNode, parent
     } = useForm<IAddPropertyInputs>({
         resolver: zodResolver(addPropertySchema),
         defaultValues: {
-            parentId: property?.parentId ?? parent?.id??undefined,
+            parentId: property ? parseInt(property?.id): parent? parseInt(parent?.id):undefined,
             images: property?.images??[""],
-            propertyType: property?.propertyType?? parent?.propertyType,
-            hostId: user?.id,
+            propertyType:  property? property?.propertyType:parent?.propertyType,
+            hostId: property? property?.hostId:parseInt(user?.id!),
             description: property?.description,
             location: property?.location,
-            pricePerNight: property?.pricePerNight,
+            pricePerNight:  property?.pricePerNight,
             title: property?.title,
             propertyStatus: property?.status??EStatus.ACTIVE,
         },
@@ -86,6 +86,14 @@ const AddProperty = ({ trigger, parent, property }: { trigger: ReactNode, parent
             mutate({ ...data, images: nwe });
         }
     };
+
+    useEffect(()=>{
+       if(parent){
+              setValue('propertyType', parent.propertyType);
+              setValue('parentId', parseInt(parent.id));
+              setValue('hostId', parent?.hostId);
+       }
+    },[parent]);
 
     return (
         <CustomDialog 

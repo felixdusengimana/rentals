@@ -4,7 +4,7 @@ import HomeSearchBar from './HomeSearch';
 export default function HomeTravelFIlters({handleFilters}: {handleFilters?: ({category, location, dateRange, guests}:{category?: string, location?: string,
     dateRange?: {start: string, end: string},
     guests?: Record<string, number>}) => void}) {
-    const [activeCategory, setActiveCategory] = React.useState('APARTMENT');
+    const [activeCategory, setActiveCategory] = React.useState('');
     const [otherFilters, setOtherFilters] = React.useState<{
         location: string;
         dateRange: {

@@ -1,6 +1,5 @@
 import React, { ReactNode, useImperativeHandle, useState, forwardRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { BiCloset } from 'react-icons/bi';
 import { IoClose } from 'react-icons/io5';
 
 interface DialogProps {

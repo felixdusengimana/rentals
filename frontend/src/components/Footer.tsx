@@ -28,7 +28,7 @@ const Footer = () => {
                                 {isAuthenticated ? (
                                     <Link href={user?.role ==ERole.RENTER ? "/business" : "/properties"} className="text-sm hover:underline">List your property</Link>
                                 ):(
-                                    <AuthModel label="List your property" type="login"/>
+                                    <AuthModel trigger={<span className="text-sm hover:underline">List your property</span>} type="login"/>
                                 )}
                             </li>
                             <li><a href="#" className="text-sm hover:underline">Host protection</a></li>
