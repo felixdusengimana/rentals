@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { Property } from '../models/Property.js';
+import { filterValidProperties } from '../utils/validateFilters.js';
 
 export const createProperty = async (req, res) => {
   try {
@@ -87,12 +88,13 @@ export const updatePropertyStatus = async (req, res) => {
 
 export const getAllProperties = async (req, res) => {
   try {
-    const { parentId,  page = 1, pageSize = 10 } = req.query;
+    const { parentId, category,  page = 1, pageSize = 10 } = req.query;
     const offset = (page - 1) * pageSize;
 
+    const filters = filterValidProperties({category,parentId});
     const properties = await Property.findAll({
       where: {
-        parentId: parentId || null,
+        ...filters,
         status: { [Op.ne]: 'DELETED' }
       },
       limit: pageSize, 
@@ -104,7 +106,17 @@ export const getAllProperties = async (req, res) => {
       }],
     });
 
-    res.status(200).json(properties);
+    const total = await Property.count({ where: { ...filters, status: { [Op.ne]: 'DELETED' } } });
+    const totalPages = Math.ceil(total / pageSize);
+
+    res.status(200).json({
+      data: properties??[],
+      page: page,
+      pageSize: pageSize,
+      totalPages: totalPages,
+      totalElements: total,
+      status: 'success',
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching properties', error: error.message });
   }

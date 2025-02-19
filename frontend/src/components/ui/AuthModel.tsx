@@ -2,11 +2,11 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { RxCross1 } from 'react-icons/rx';
 
-export default function AuthModel({ type }: { type: "login" | "signup" }) {
+export default function AuthModel({ type, label }: { type: "login" | "signup", label?: string }) {
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
-            <p className="px-3 cursor-pointer py-2 text-sm font-medium hover:text-gray-300">{type=="login"?"Log In":"Sign Up"}</p>
+            <p className="cursor-pointer py-2 text-sm font-medium hover:text-gray-300">{label?label: type=="login"?"Log In":"Sign Up"}</p>
             </Dialog.Trigger>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
