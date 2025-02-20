@@ -2,6 +2,7 @@ import React from 'react';
 import { EStatus, IProperty } from '../types/properties';
 import { BiChevronLeft, BiChevronRight, BiHeart } from 'react-icons/bi';
 import Link from 'next/link';
+import Button from './ui/Button';
 
 const DEFAULT_IMAGE = "https://cornerstonepropertymgmt.com/wp-content/themes/cornerstone/assets/img/nofeaturedimage.jpg";
 
@@ -36,15 +37,15 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
   const hasImages = property.images && property.images.length > 0;
 
 
+  const linkTo = (property?.children?.length&&property?.children?.length > 0)?
+    `/property/${property.id}`:`/property/${property.id}/book`;
+
   return (
-    <Link href={
-      (property?.children?.length&&property?.children?.length > 0)
-        ? `/property/${property.id}`
-        : `/property/${property.id}/book`
-    } className="relative group">
+    <div className="relative group">
       <div className="overflow-hidden rounded-xl aspect-square">
         {hasImages ? (
           <div className="relative w-full h-full">
+            <Link href={linkTo}>
             {failedImages.has(currentImageIndex) ? (
               <img 
                 src={DEFAULT_IMAGE}
@@ -61,6 +62,7 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
                 onError={() => handleImageError(currentImageIndex)}
               />
             )}
+            </Link>
             {property.images.length > 1 && (
               <>
                 <button 
@@ -77,7 +79,7 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
                 </button>
               </>
             )}
-            
+            <Link href={linkTo}>
             {property.images.length > 1 && (
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                 {property.images.map((_, index) => (
@@ -90,15 +92,16 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
                 ))}
               </div>
             )}
+            </Link>
           </div>
         ) : (
-          <div className="w-full h-full bg-gray-100">
+          <Link href={linkTo} className="w-full h-full bg-gray-100">
             <img 
               src={DEFAULT_IMAGE}
               alt="No image available"
               className="w-full h-full object-cover"
             />
-          </div>
+          </Link>
         )}
       </div>
       
@@ -119,19 +122,27 @@ const HomePropertyCard = ({ property }: { property: IProperty }) => {
         </div>
       )}
       
-      <div className="mt-2">
+      <Link href={linkTo} className="mt-2">
         <div className="flex justify-between items-start">
           <h3 className="font-medium">{property.title}</h3>
           <div className="flex items-center space-x-1 text-blue-600">
             <span>★</span>
-            <span>4.9</span>
+            <span>5</span>
           </div>
         </div>
         <p className="text-gray-500 text-sm">{property.location}</p>
         <p className="text-gray-500 text-sm">{property.propertyType} {property.parentId?"ROOM":""}</p>
-        <p className="font-medium mt-1">${property.pricePerNight} <span className="font-normal text-gray-500">night</span></p>
-      </div>
-    </Link>
+        {property.children?.length&&property.children?.length > 0 ?(
+          <p className="text-gray-500 text-sm">Rooms: {property.children.length}</p>
+        ):<p className="font-medium mt-1">${property.pricePerNight} <span className="font-normal text-gray-500">night</span></p>}
+      </Link>
+
+      <Link href={linkTo}>
+        <Button>
+          Book now
+        </Button>
+      </Link>
+    </div>
   );
 };
 
