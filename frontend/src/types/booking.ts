@@ -25,12 +25,13 @@ export enum EBookingStatus {
 
     
 export const bookingStepThreeSchema = z.object({
-  amount: z.number().min(0.01, "Amount should be greater than zero"),
-  numberOfRooms: z.number().min(1, "Number of rooms should be at least 1"),
-  checkIn: z.string({
+  numberOfRooms: z.number({
+    invalid_type_error: "Number of rooms should be a number",
+  }).min(1, "Number of rooms should be at least 1"),
+  checkInDate: z.string({
     required_error: "Check-in date is required",
   }),
-  checkOut: z.string({
+  checkOutDate: z.string({
     required_error: "Check-out date is required",
   }),
   guests: z.number().min(1),

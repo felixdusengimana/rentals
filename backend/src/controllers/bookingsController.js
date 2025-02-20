@@ -7,14 +7,16 @@ import { User } from "../models/User.js";
 import {filterValidProperties} from "../utils/validateFilters.js";
 
 export const createBooking = async (req, res) => {
-  req.user={
-    id: 1, 
-    name: "Felix Dusengimana"
-  }
   try {
-    const { propertyId, checkInDate, checkOutDate} = req.body;
+    const { propertyId, renterId, checkInDate, checkOutDate} = req.body;
 
     const property = await Property.findByPk(propertyId);
+    const renter = await User.findByPk(renterId);
+
+    if(!renter){
+      return res.status(404).json({ message: 'Renter not found' });
+    }
+
     if (!property || property.status !== 'ACTIVE') {
       return res.status(404).json({ message: 'Property not found or unavailable' });
     }
@@ -37,7 +39,7 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ message: 'Invalid dates: check-out must be after check-in' });
     }
 
-    const amount = property.price * days;
+    const amount = property.pricePerNight * days;
 
     
     const overlappingBooking = await Booking.findOne({
@@ -58,7 +60,7 @@ export const createBooking = async (req, res) => {
     }
 
     const booking = await Booking.create({
-      renterId: req.user.id,
+      renterId,
       propertyId,
       checkInDate,
       checkOutDate,
@@ -68,7 +70,7 @@ export const createBooking = async (req, res) => {
     const emailSubject = 'Booking Confirmation - LaLa Rental';
 
     const emailHtml = `
-      <h3>Hi ${req.user.name},</h3>
+      <h3>Hi ${renter.name},</h3>
       <p>Your booking has been confirmed!</p>
       <p><strong>Booking Details:</strong></p>
       <ul>
@@ -81,7 +83,7 @@ export const createBooking = async (req, res) => {
       <p>Best regards, <br/> LaLa Rental Team</p>
     `;
 
-    await sendEmail(req.user.email, emailSubject, emailHtml);
+    await sendEmail(renter.email, emailSubject, emailHtml);
 
     res.status(201).json({ message: 'Booking request sent', booking });
   } catch (error) {
