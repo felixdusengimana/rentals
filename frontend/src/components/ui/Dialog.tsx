@@ -16,10 +16,9 @@ export interface CustomDialogRef {
 const CustomDialog = forwardRef<CustomDialogRef, DialogProps>(({ trigger, title, description, children }: DialogProps, ref) => {
   const [open, setOpen] = useState(false);
 
-  // Expose the `close` method to parent components using the ref
   useImperativeHandle(ref, () => ({
     close: () => {
-      setOpen(false); // Close the dialog by setting open to false
+      setOpen(false); 
     }
   }));
 

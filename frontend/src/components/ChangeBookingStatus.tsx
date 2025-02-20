@@ -22,7 +22,8 @@ const ChangeBookingStatus = ({ trigger, booking, newStatus }: { trigger: ReactNo
             modalRef.current?.close();
         },
         onError(error) {
-            toast.error(`${error.message ?? `${newStatus===EBookingStatus.CANCELED?"Cancelling":"Confirming"} booking failed!`}`, {
+            // @ts-ignore
+            toast.error(`${error?.response?.data?.message??error.message ?? `${newStatus===EBookingStatus.CANCELED?"Cancelling":"Confirming"} booking failed!`}`, {
                 id: "register",
             });
         },

@@ -18,10 +18,8 @@ export const formatDate = (date: Date) => {
     const date2 = new Date(dateStr2)
 
     
-    // Calculate the difference in days
     const differenceInDaysResult = differenceInDays(date2, date1);
     
-    console.log({differenceInDaysResult})
     return Math.abs(differenceInDaysResult);
   }
   

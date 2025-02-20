@@ -21,7 +21,8 @@ const ChangePropertyStatus = ({ trigger, property, newStatus }: { trigger: React
             modalRef.current?.close();
         },
         onError(error) {
-            toast.error(`${error.message ?? `${newStatus===EStatus.DELETED?"Deleting":"Updating"} failed!`}`, {
+            // @ts-ignore
+            toast.error(`${error?.response?.data?.message??error.message ?? `${newStatus===EStatus.DELETED?"Deleting":"Updating"} failed!`}`, {
                 id: "register",
             });
         },

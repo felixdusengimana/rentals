@@ -23,7 +23,8 @@ export default function PaymentSimulation() {
 
     },
     onError(error: any) {
-      toast.error(`${error.message ?? "Error while booking"}`, { id: "booking" });
+     // @ts-ignore
+     toast.error(`${error?.response?.data?.message?? error.message ?? "Error while booking"}`, { id: "booking" });
       setMessage("An error occurred. Please try again.");
     },
     mutationFn: (data:{

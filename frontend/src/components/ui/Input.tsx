@@ -50,7 +50,6 @@ export default function Input({ value, ...props }: InputProps) {
     setLocalValue(
       (type === "number" ? value?.toLocaleString() : String(value ?? "")) || ""
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (

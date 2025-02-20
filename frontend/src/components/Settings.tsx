@@ -26,7 +26,6 @@ const Settings = ({ user }: { user: IUser }) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Settings updated successfully!");
-      console.log("Updated Settings:", data);
     } catch (error) {
       toast.error("Failed to update settings.");
     }

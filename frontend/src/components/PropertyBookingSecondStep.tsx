@@ -78,7 +78,8 @@ export default function PropertyBookingSecondStep({ onNext, onPrevious }: Proper
             toast.success("Booking successfully!", { id: "booking" });
         },
         onError(error) {
-            toast.error(`${error.message ?? "Error while booking"}`, {
+            // @ts-ignore
+            toast.error(`${error?.response?.data?.message?? error.message ?? "Error while booking"}`, {
                 id: "booking",
             });
         },

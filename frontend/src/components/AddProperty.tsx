@@ -50,7 +50,8 @@ const AddProperty = ({ trigger, parent, property }: { trigger: ReactNode, parent
             modalRef.current?.close();
         },
         onError(error) {
-            toast.error(`${error.message ?? "Registration failed!"}`, {
+            // @ts-ignore
+            toast.error(`${error?.response?.data?.message??error.message ?? "Registration failed!"}`, {
                 id: "register",
             });
         },
@@ -68,7 +69,8 @@ const AddProperty = ({ trigger, parent, property }: { trigger: ReactNode, parent
             modalRef.current?.close();
         },
         onError(error) {
-            toast.error(`${error.message ?? "Update failed!"}`, {
+            // @ts-ignore
+            toast.error(`${error?.response?.data?.message??error.message ?? "Update failed!"}`, {
                 id: "register",
             });
         },
