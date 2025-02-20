@@ -27,7 +27,7 @@ const useAuth = () => {
       }); 
 
       localStorage.removeItem("authToken");
-      window.location.href  ="/auth/login";
+      window.location.href  ="/";
     },
   });
 

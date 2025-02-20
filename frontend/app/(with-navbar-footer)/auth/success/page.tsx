@@ -12,9 +12,15 @@ const Success = () => {
 
       if (token) {
         localStorage.setItem('authToken', token);
-        router.replace('/');
+        const redirectUrl = localStorage.getItem('redirectUrl');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectUrl');
+          router.replace(redirectUrl);
+        }else{
+          router.replace('/');
+        }
       } else {
-        router.replace('/auth/login');
+        router.replace('/');
       }
     }
   }, [router]);

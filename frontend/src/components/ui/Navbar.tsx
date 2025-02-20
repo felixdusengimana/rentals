@@ -45,11 +45,11 @@ const Navbar = () => {
                   <DropdownMenu.Trigger asChild>
                     <div className="flex items-center space-x-3">
                       <img
-                        src={user.photo}
-                        alt={user.name}
+                        src={user?.photo}
+                        alt={user?.name}
                         className="w-8 h-8 rounded-full border border-white"
                       />
-                      <span>{user.name}</span>
+                      <span>{user?.name}</span>
 
                       <BiCaretDown className="ml-1 h-4 w-4" />
                     </div>

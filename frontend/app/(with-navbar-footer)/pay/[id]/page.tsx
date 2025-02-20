@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import useAuth from "@/src/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/src/utils/axios";
+import AuthModel from "@/src/components/ui/AuthModel";
 
 export default function PaymentSimulation() {
   const { user } = useAuth();
@@ -43,18 +44,19 @@ export default function PaymentSimulation() {
       mutate(paymentData);
   };
 
+
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="bg-white shadow-lg rounded-lg p-6 w-96 text-center">
           <h2 className="text-2xl font-bold mb-4">You need to log in first</h2>
           <p className="mb-4">Please log in to complete your payment.</p>
-          <Button
+          <AuthModel trigger={<Button
             className="bg-co-blue text-white hover:bg-blue-700 border-0 w-full"
             onClick={() => router.push("/login")}
           >
             Log in
-          </Button>
+          </Button>} type="login"/>
         </div>
       </div>
     );
