@@ -92,6 +92,9 @@ Example database URL:
 DATABASE_URL=postgres://username:password@localhost:5432/database_name
 ```
 
+If you already have docker installed in your device, run this command: ```docker compose up``` it will setup database and expose it to this url
+```postgresql://lala_user:lala_password@localhost:5432/lala_rentals``` which you can use directly.
+
 Running the App
 Once both the backend and frontend servers are running, visit the following URLs in your browser:
 
