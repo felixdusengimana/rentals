@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { ERole } from '@/src/types/user';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isHost, isRenter, isLoading, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [hideBanner, setHideBanner] = React.useState(false);
 
@@ -21,8 +21,11 @@ const Navbar = () => {
   }
 
   const loggedDropdownItems = [
-    { title: 'Dashboard', link: '/bookings' },
-    { title: 'Settings', link: '/settings' },
+    { title: 'Dashboard', link: '/dashboard', visible: true },
+    { title: 'Bookings', link: '/bookings', visible: isHost },
+    { title: 'Properties', link: '/properties', visible: isHost },
+    { title: 'My Bookings', link: '/my-bookings', visible: isRenter },
+    { title: 'Settings', link: '/settings', visible: true },
   ];
 
   useEffect(() => {
@@ -40,12 +43,13 @@ const Navbar = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-1">
-              {isAuthenticated ? (
+              {isLoading?null: isAuthenticated ? (
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <div className="flex items-center space-x-3">
                       <img
                         src={user?.photo}
+                        loading='lazy'
                         alt={user?.name}
                         className="w-8 h-8 rounded-full border border-white"
                       />
@@ -56,7 +60,7 @@ const Navbar = () => {
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content className="bg-white rounded-md shadow-lg p-1 min-w-[180px] z-20" sideOffset={5}>
-                      {loggedDropdownItems.map((dropItem, idx) => (
+                      {loggedDropdownItems.filter((d)=>d.visible).map((dropItem, idx) => (
                         <DropdownMenu.Item key={idx} className="text-gray-700 hover:bg-gray-100 rounded-md focus:outline-none">
                           <Link href={dropItem.link} className="block px-4 py-2 text-sm">
                             {dropItem.title}
@@ -109,7 +113,7 @@ const Navbar = () => {
           </div>
       </nav>
 
-      {!hideBanner && (user?.role != ERole.HOST || (!user?.role)) && isAuthenticated ?
+      {isLoading?null: !hideBanner && (user?.role != ERole.HOST || (!user?.role)) && isAuthenticated ?
         <div className="bg-gray-200 py-2">
           <div className="flex items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">

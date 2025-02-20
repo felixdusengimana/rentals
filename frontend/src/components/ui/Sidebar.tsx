@@ -5,12 +5,13 @@ import { HiMenu, HiX, HiPlus, HiOfficeBuilding, HiChevronDown, HiHome, HiCog, Hi
 import useAuth from '@/src/hooks/useAuth';
 import AddProperty from '../AddProperty';
 import Link from 'next/link';
+import { ERole } from '@/src/types/user';
 
 const Sidebar = ({isExpanded, setIsExpanded}:{
     isExpanded: boolean;
     setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user,isLoading, isHost, logout } = useAuth();
 
     return (
         <div className={`fixed h-[calc(100vh-3.5rem)] transition-all duration-300 bg-white border-r
@@ -44,14 +45,14 @@ const Sidebar = ({isExpanded, setIsExpanded}:{
                                 <Link href="/my-bookings" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
                                     {isExpanded && <span>My Bookings</span>}
                                 </Link>
-                                <Link href="/bookings" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
-                                    {isExpanded && <span>Client Bookings</span>}
-                                </Link>
+                                {isHost&&<Link href="/bookings" className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100 rounded-lg">
+                                    {isExpanded && <span>Client's Bookings</span>}
+                                </Link>}
                             </Collapsible.Content>
                         )}
                     </Collapsible.Root>
                 </div>
-                <div className="space-y-2">
+                {isHost&&<div className="space-y-2">
                     <Collapsible.Root className="space-y-1">
                         <Collapsible.Trigger className="flex items-center justify-between w-full p-2 hover:bg-gray-100 rounded-lg">
                             <div className="flex items-center gap-2">
@@ -73,7 +74,7 @@ const Sidebar = ({isExpanded, setIsExpanded}:{
                             </Collapsible.Content>
                         )}
                     </Collapsible.Root>
-                </div>
+                </div>}
 
 
                 <div className="space-y-2 pt-4 border-t">
@@ -88,7 +89,7 @@ const Sidebar = ({isExpanded, setIsExpanded}:{
                     </Link>
                 </div>
 
-                {isExpanded && (
+                {isLoading? null:isExpanded && (
                     <div className="absolute cursor-pointer bottom-0 left-0 right-0 p-4 border-t">
                         <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg">
                             <img
@@ -101,7 +102,7 @@ const Sidebar = ({isExpanded, setIsExpanded}:{
                                 <p className="text-sm text-gray-500">View Profile</p>
                             </div>
                         </div>
-                        <button className="flex items-center gap-2 w-full p-2 mt-2 hover:bg-gray-100 rounded-lg text-red-600">
+                        <button onClick={()=>logout()} className="flex items-center gap-2 w-full p-2 mt-2 hover:bg-gray-100 rounded-lg text-red-600">
                             <HiLogout className="h-5 w-5" />
                             <span>Sign Out</span>
                         </button>

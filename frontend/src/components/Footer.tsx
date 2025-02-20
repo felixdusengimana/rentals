@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
 import useAuth from "../hooks/useAuth";
-import { ERole } from "../types/user";
 import AuthModel from "./ui/AuthModel";
 
 const Footer = () => {
-    const {user, isAuthenticated} = useAuth();
+    const {isAuthenticated, isRenter} = useAuth();
     return (
         <footer className="border-t bg-gray-50 py-12">
             <div className="max-w-7xl mx-auto px-4">
@@ -26,7 +25,7 @@ const Footer = () => {
                         <ul className="space-y-3">
                             <li>
                                 {isAuthenticated ? (
-                                    <Link href={user?.role ==ERole.RENTER ? "/business" : "/properties"} className="text-sm hover:underline">List your property</Link>
+                                    <Link href={isRenter ? "/business" : "/properties"} className="text-sm hover:underline">List your property</Link>
                                 ):(
                                     <AuthModel trigger={<span className="text-sm hover:underline">List your property</span>} type="login"/>
                                 )}
