@@ -113,11 +113,14 @@ export const confirmBooking = async (req, res) => {
       status: 'UNPAID', 
     });
 
+    const paymentLink = process.env.FRONTEND_URL + '/pay/' + payment.id;
+
     const hostEmailContent = `
       <h2>Booking Accepted</h2>
       <p>Dear Host,</p>
       <p>Your booking ID: <strong>${bookingId}</strong> has been confirmed.</p>
       <p>Payment of <strong>$${amount}</strong> is now pending from the renter.</p>
+      <p>Thank you for using LaLa Booking!</p>
     `;
 
     await sendEmail(hostEmail, 'Booking Confirmed - LaLa Booking', hostEmailContent);
@@ -127,6 +130,9 @@ export const confirmBooking = async (req, res) => {
       <p>Dear Renter,</p>
       <p>Your booking ID: <strong>${bookingId}</strong> has been confirmed by the host.</p>
       <p>Payment of <strong>$${amount}</strong> is now pending for this booking.</p>
+       <p>Click <a href="${paymentLink}">here</a> to make payment.</p>
+      <p>or copy and paste this link in your browser: ${paymentLink}</p>
+      <p>Thank you for using LaLa Booking!</p>
     `;
     await sendEmail(renterEmail, 'Booking Confirmed - LaLa Booking', renterEmailContent);
 

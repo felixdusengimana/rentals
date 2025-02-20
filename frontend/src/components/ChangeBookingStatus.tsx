@@ -17,7 +17,7 @@ const ChangeBookingStatus = ({ trigger, booking, newStatus }: { trigger: ReactNo
         onSuccess() {
             toast.success(`Booking ${newStatus===EBookingStatus.CANCELED?"cancelled":"confirmed"} successful!`, { id: "register" });
             queryClient.invalidateQueries({
-                queryKey: ["properties"],
+                queryKey: ["bookings"],
             });
             modalRef.current?.close();
         },
